@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, tick, fakeAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 import { HttpModule } from '@angular/http';
@@ -38,11 +38,34 @@ describe('TodosComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  // Using promises 1
+  it('should load todos from the server (async)', async(() => {
+    const service = TestBed.get(TodoService);
+    spyOn(service, 'getTodosPromise').and.returnValue(Promise.resolve([1, 2, 3]));
+    fixture.detectChanges();
+    fixture.whenStable().then(() => {
+      expect(component.todos.length).toBe(3);
+    });
 
+  }));
+
+  // Using promises 2
+  it('should load todos from the server (fakeAsync)', fakeAsync(() => {
+    const service = TestBed.get(TodoService);
+    spyOn(service, 'getTodosPromise').and.returnValue(Promise.resolve([1, 2, 3]));
+    fixture.detectChanges();
+
+    tick();
+    expect(component.todos.length).toBe(3);
+
+  }));
+
+  /* Using observables
   it('should load todos from the server', () => {
     const service = TestBed.get(TodoService);
     spyOn(service, 'getTodos').and.returnValue(Observable.from([[1, 2, 3]]));
     fixture.detectChanges();
     expect(component.todos.length).toBe(3);
   });
+  */
 });
